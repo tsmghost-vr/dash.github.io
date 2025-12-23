@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Discord Bot Dashboard</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+input { margin: 5px; padding: 5px; }
+button { padding: 5px 10px; margin: 5px; }
+#results { margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<h2>Discord Bot Dashboard (LAN Access)</h2>
+
+<input id="cmd" placeholder="Command (say, ping, hello)">
+<input id="args" placeholder="Arguments (space separated)">
+<input id="channel" placeholder="Channel ID">
+<button onclick="runCommand()">Run</button>
+<button onclick="loadCommands()">Load Commands</button>
+
+<div id="results"></div>
+
+<script>
+const API_KEY = "7712";  // Must match bot.py
+const API_URL = "http://192.168.1.100:8000"; // Replace with your PC's LAN IP
+
+async function runCommand() {
+    const cmd = document.getElementById("cmd").value;
+    const args = document.getElementById("args").value.split(" ");
+    const channel = Number(document.getElementById("channel").value);
+
+    const res = await fetch(`${API_URL}/run`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            command: cmd, 
+            args: args, 
+            channel_id: channel,
+            api_key: API_KEY
+        })
+    });
+
+    const data = await res.json();
+    document.getElementById("results").innerText = JSON.stringify(data, null, 2);
+}
+
+async function loadCommands() {
+    const res = await fetch(`${API_URL}/commands`);
+    const data = await res.json();
+    document.getElementById("results").innerText = "Available commands: " + data.join(", ");
+}
+</script>
+
+</body>
+</html>
